@@ -12,15 +12,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HallBooking.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260128125154_CreateConstriants")]
-    partial class CreateConstriants
+    [Migration("20260210085853_SeedMoreTestData")]
+    partial class SeedMoreTestData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.2")
+                .HasAnnotation("ProductVersion", "9.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -43,6 +43,12 @@ namespace HallBooking.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("now()");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("description");
 
                     b.Property<string>("InstructorName")
                         .IsRequired()
@@ -103,6 +109,45 @@ namespace HallBooking.Migrations
                     b.ToTable("course_enrollments", (string)null);
                 });
 
+            modelBuilder.Entity("HallBooking.Entities.CourseSession", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("integer")
+                        .HasColumnName("course_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("end_time");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("start_time");
+
+                    b.HasKey("Id")
+                        .HasName("pk_course_sessions");
+
+                    b.HasIndex("CourseId")
+                        .HasDatabaseName("ix_course_sessions_course_id");
+
+                    b.HasIndex("StartTime", "EndTime")
+                        .HasDatabaseName("ix_course_sessions_start_time_end_time");
+
+                    b.ToTable("course_sessions", (string)null);
+                });
+
             modelBuilder.Entity("HallBooking.Entities.HallRental", b =>
                 {
                     b.Property<int>("Id")
@@ -119,7 +164,7 @@ namespace HallBooking.Migrations
                         .HasDefaultValueSql("now()");
 
                     b.Property<DateTime>("EndTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("end_time");
 
                     b.Property<decimal>("HourlyPrice")
@@ -132,7 +177,7 @@ namespace HallBooking.Migrations
                         .HasColumnName("member_id");
 
                     b.Property<DateTime>("StartTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("start_time");
 
                     b.Property<int>("Status")
@@ -140,11 +185,6 @@ namespace HallBooking.Migrations
                         .HasColumnType("integer")
                         .HasDefaultValue(0)
                         .HasColumnName("status");
-
-                    b.Property<decimal>("TotalPrice")
-                        .HasPrecision(7, 2)
-                        .HasColumnType("numeric(7,2)")
-                        .HasColumnName("total_price");
 
                     b.HasKey("Id")
                         .HasName("pk_hall_rentals");
@@ -190,6 +230,29 @@ namespace HallBooking.Migrations
                         .HasDatabaseName("ix_members_email");
 
                     b.ToTable("members", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "anna@mail.com",
+                            Name = "Anna Andersson"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "brotherbear@mail.com",
+                            Name = "Björn Berg"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "cissi@example.com",
+                            Name = "Cecilia Carlsson"
+                        });
                 });
 
             modelBuilder.Entity("HallBooking.Entities.Payment", b =>
@@ -266,6 +329,18 @@ namespace HallBooking.Migrations
                     b.Navigation("Member");
                 });
 
+            modelBuilder.Entity("HallBooking.Entities.CourseSession", b =>
+                {
+                    b.HasOne("HallBooking.Entities.Course", "Course")
+                        .WithMany("Sessions")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_course_sessions_courses_course_id");
+
+                    b.Navigation("Course");
+                });
+
             modelBuilder.Entity("HallBooking.Entities.HallRental", b =>
                 {
                     b.HasOne("HallBooking.Entities.Member", "Member")
@@ -309,6 +384,8 @@ namespace HallBooking.Migrations
             modelBuilder.Entity("HallBooking.Entities.Course", b =>
                 {
                     b.Navigation("Enrollments");
+
+                    b.Navigation("Sessions");
                 });
 
             modelBuilder.Entity("HallBooking.Entities.CourseEnrollment", b =>

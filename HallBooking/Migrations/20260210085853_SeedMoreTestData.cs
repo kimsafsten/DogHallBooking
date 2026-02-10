@@ -10,7 +10,7 @@ namespace HallBooking.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            var createdAt = new DateTime(2026, 02, 05, 10, 00, 00, DateTimeKind.Utc);
+            var createdAt = new DateTime(2026, 02, 05, 10, 00, 00, DateTimeKind.Unspecified);
 
             // --------------------
             // COURSES
@@ -24,8 +24,7 @@ namespace HallBooking.Migrations
                     "instructor_name",
                     "description",
                     "capacity",
-                    "price_per_participant",
-                    "created_at"
+                    "price_per_participant"
                 },
                 values: new object[,]
                 {
@@ -35,8 +34,7 @@ namespace HallBooking.Migrations
                         "Sofia Sjöberg",
                         "Introduktion till agility för nybörjare.",
                         8,
-                        1495m,
-                        createdAt
+                        1495m
                     },
                     {
                         11,
@@ -44,10 +42,10 @@ namespace HallBooking.Migrations
                         "Johan Nilsson",
                         "Grunder i nosework: doft, sök och belöning.",
                         10,
-                        1295m,
-                        createdAt
+                        1295m
                     }
                 });
+
 
             // --------------------
             // COURSE SESSIONS
@@ -59,31 +57,27 @@ namespace HallBooking.Migrations
                     "id",
                     "course_id",
                     "start_time",
-                    "end_time",
-                    "created_at"
+                    "end_time"
                 },
                 values: new object[,]
                 {
                     {
                         100,
                         10,
-                        new DateTime(2026, 02, 12, 17, 00, 00, DateTimeKind.Utc),
-                        new DateTime(2026, 02, 12, 19, 00, 00, DateTimeKind.Utc),
-                        createdAt
+                        new DateTime(2026, 02, 12, 17, 00, 00, DateTimeKind.Unspecified),
+                        new DateTime(2026, 02, 12, 19, 00, 00, DateTimeKind.Unspecified)
                     },
                     {
                         101,
                         10,
-                        new DateTime(2026, 02, 19, 17, 00, 00, DateTimeKind.Utc),
-                        new DateTime(2026, 02, 19, 19, 00, 00, DateTimeKind.Utc),
-                        createdAt
+                        new DateTime(2026, 02, 19, 17, 00, 00, DateTimeKind.Unspecified),
+                        new DateTime(2026, 02, 19, 19, 00, 00, DateTimeKind.Unspecified)
                     },
                     {
                         110,
                         11,
-                        new DateTime(2026, 02, 14, 18, 00, 00, DateTimeKind.Utc),
-                        new DateTime(2026, 02, 14, 20, 00, 00, DateTimeKind.Utc),
-                        createdAt
+                        new DateTime(2026, 02, 14, 18, 00, 00, DateTimeKind.Unspecified),
+                        new DateTime(2026, 02, 14, 20, 00, 00, DateTimeKind.Unspecified)
                     }
                 });
 
@@ -96,24 +90,21 @@ namespace HallBooking.Migrations
                 {
                     "id",
                     "course_id",
-                    "member_id",
-                    "created_at"
+                    "member_id"
                 },
                 values: new object[,]
                 {
-                    { 200, 10, 1, createdAt },
-                    { 201, 10, 2, createdAt },
-                    { 202, 11, 3, createdAt }
+                    { 200, 10, 1 },
+                    { 201, 10, 2 },
+                    { 202, 11, 3 }
                 });
 
             // --------------------
             // HALL RENTAL
             // --------------------
-            var rentalStart = new DateTime(2026, 02, 15, 12, 00, 00, DateTimeKind.Utc);
-            var rentalEnd = new DateTime(2026, 02, 15, 14, 00, 00, DateTimeKind.Utc);
+            var rentalStart = new DateTime(2026, 02, 15, 12, 00, 00, DateTimeKind.Unspecified);
+            var rentalEnd = new DateTime(2026, 02, 15, 14, 00, 00, DateTimeKind.Unspecified);
             var hourlyPrice = 280m;
-            var hours = 2;
-            var totalPrice = hours * hourlyPrice;
 
             migrationBuilder.InsertData(
                 table: "hall_rentals",
@@ -124,8 +115,7 @@ namespace HallBooking.Migrations
                     "start_time",
                     "end_time",
                     "status",
-                    "hourly_price",
-                    "created_at"
+                    "hourly_price"
                 },
                 values: new object[]
                 {
@@ -134,13 +124,15 @@ namespace HallBooking.Migrations
                     rentalStart,
                     rentalEnd,
                     0,
-                    hourlyPrice,
-                    createdAt
+                    hourlyPrice
                 });
 
             // --------------------
             // PAYMENT (for hall rental)
             // --------------------
+            var hours = 2;
+            var totalPrice = hours * hourlyPrice;
+
             migrationBuilder.InsertData(
                 table: "payments",
                 columns: new[]
@@ -149,7 +141,6 @@ namespace HallBooking.Migrations
                     "member_id",
                     "amount",
                     "status",
-                    "created_at",
                     "hall_rental_id",
                     "course_enrollment_id"
                 },
@@ -159,10 +150,10 @@ namespace HallBooking.Migrations
                     1,
                     totalPrice,
                     0,
-                    createdAt,
                     300,
                     null
                 });
+
         }
 
         /// <inheritdoc />
@@ -182,6 +173,7 @@ namespace HallBooking.Migrations
 
             migrationBuilder.DeleteData(table: "courses", keyColumn: "id", keyValue: 10);
             migrationBuilder.DeleteData(table: "courses", keyColumn: "id", keyValue: 11);
+
         }
     }
 }

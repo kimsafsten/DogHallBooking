@@ -1,5 +1,6 @@
 ﻿using HallBooking.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace HallBooking.Data
 {
@@ -14,9 +15,14 @@ namespace HallBooking.Data
      
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            var config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false)
+                .Build();
+            var cs = config.GetConnectionString("Default");
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql("Host=localhost;Database=hall_booking_db;Username=postgres;Password=postgres");
+                optionsBuilder.UseNpgsql(cs);
             }
             optionsBuilder.UseSnakeCaseNamingConvention();
         }

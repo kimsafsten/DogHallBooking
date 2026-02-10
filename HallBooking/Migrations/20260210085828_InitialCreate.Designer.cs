@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HallBooking.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260128101614_InitialCreate")]
+    [Migration("20260210085828_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace HallBooking.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.2")
+                .HasAnnotation("ProductVersion", "9.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -39,21 +39,32 @@ namespace HallBooking.Migrations
                         .HasColumnName("capacity");
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("description");
 
                     b.Property<string>("InstructorName")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
                         .HasColumnName("instructor_name");
 
                     b.Property<decimal>("PricePerParticipant")
-                        .HasColumnType("numeric")
+                        .HasPrecision(7, 2)
+                        .HasColumnType("numeric(7,2)")
                         .HasColumnName("price_per_participant");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(75)
+                        .HasColumnType("character varying(75)")
                         .HasColumnName("title");
 
                     b.HasKey("Id")
@@ -76,8 +87,10 @@ namespace HallBooking.Migrations
                         .HasColumnName("course_id");
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<int>("MemberId")
                         .HasColumnType("integer")
@@ -96,6 +109,45 @@ namespace HallBooking.Migrations
                     b.ToTable("course_enrollments", (string)null);
                 });
 
+            modelBuilder.Entity("HallBooking.Entities.CourseSession", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("integer")
+                        .HasColumnName("course_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("end_time");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("start_time");
+
+                    b.HasKey("Id")
+                        .HasName("pk_course_sessions");
+
+                    b.HasIndex("CourseId")
+                        .HasDatabaseName("ix_course_sessions_course_id");
+
+                    b.HasIndex("StartTime", "EndTime")
+                        .HasDatabaseName("ix_course_sessions_start_time_end_time");
+
+                    b.ToTable("course_sessions", (string)null);
+                });
+
             modelBuilder.Entity("HallBooking.Entities.HallRental", b =>
                 {
                     b.Property<int>("Id")
@@ -106,15 +158,18 @@ namespace HallBooking.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<DateTime>("EndTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("end_time");
 
                     b.Property<decimal>("HourlyPrice")
-                        .HasColumnType("numeric")
+                        .HasPrecision(6, 2)
+                        .HasColumnType("numeric(6,2)")
                         .HasColumnName("hourly_price");
 
                     b.Property<int>("MemberId")
@@ -122,16 +177,14 @@ namespace HallBooking.Migrations
                         .HasColumnName("member_id");
 
                     b.Property<DateTime>("StartTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("timestamp without time zone")
                         .HasColumnName("start_time");
 
                     b.Property<int>("Status")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
+                        .HasDefaultValue(0)
                         .HasColumnName("status");
-
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("numeric")
-                        .HasColumnName("total_price");
 
                     b.HasKey("Id")
                         .HasName("pk_hall_rentals");
@@ -152,23 +205,54 @@ namespace HallBooking.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("email");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
                         .HasColumnName("name");
 
                     b.HasKey("Id")
                         .HasName("pk_members");
 
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasDatabaseName("ix_members_email");
+
                     b.ToTable("members", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "anna@mail.com",
+                            Name = "Anna Andersson"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "brotherbear@mail.com",
+                            Name = "Björn Berg"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "cissi@example.com",
+                            Name = "Cecilia Carlsson"
+                        });
                 });
 
             modelBuilder.Entity("HallBooking.Entities.Payment", b =>
@@ -181,7 +265,8 @@ namespace HallBooking.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("numeric")
+                        .HasPrecision(7, 2)
+                        .HasColumnType("numeric(7,2)")
                         .HasColumnName("amount");
 
                     b.Property<int?>("CourseEnrollmentId")
@@ -189,8 +274,10 @@ namespace HallBooking.Migrations
                         .HasColumnName("course_enrollment_id");
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<int?>("HallRentalId")
                         .HasColumnType("integer")
@@ -201,7 +288,9 @@ namespace HallBooking.Migrations
                         .HasColumnName("member_id");
 
                     b.Property<int>("Status")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
+                        .HasDefaultValue(0)
                         .HasColumnName("status");
 
                     b.HasKey("Id")
@@ -238,6 +327,18 @@ namespace HallBooking.Migrations
                     b.Navigation("Course");
 
                     b.Navigation("Member");
+                });
+
+            modelBuilder.Entity("HallBooking.Entities.CourseSession", b =>
+                {
+                    b.HasOne("HallBooking.Entities.Course", "Course")
+                        .WithMany("Sessions")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_course_sessions_courses_course_id");
+
+                    b.Navigation("Course");
                 });
 
             modelBuilder.Entity("HallBooking.Entities.HallRental", b =>
@@ -283,6 +384,8 @@ namespace HallBooking.Migrations
             modelBuilder.Entity("HallBooking.Entities.Course", b =>
                 {
                     b.Navigation("Enrollments");
+
+                    b.Navigation("Sessions");
                 });
 
             modelBuilder.Entity("HallBooking.Entities.CourseEnrollment", b =>

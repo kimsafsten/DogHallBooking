@@ -4,9 +4,9 @@ By **Kim Säfsten**
 School project for **MI Systemutvecklare.NET**  
 Course: **Entity Framwork**
 
-A console application written in C# using **Entity Framework Core (Code First)** together with  
+A console application written in C# using **Entity Framework Core (Code First)** and  
 **PostgreSQL**.  
-The application is a booking system for a dog training hall and was created as a school
+The application is a bookingsystem for a dog training hall and was created as a school
 assignment to demonstrate skills in EF Core.
 
 ---
@@ -21,30 +21,35 @@ assignment to demonstrate skills in EF Core.
 
 ## Database
 
-The connection string is configured in `AppDbContext`:
+The application uses **PostgreSQL** with **Entity Framework Core (Code First)**.
+
+Database configuration is handled via `appsettings.json`.
+An example file is provided as `appsettings.Example.json`.
 
 
-```csharp
-optionsBuilder.UseNpgsql(
-    "Host=localhost;Database=hall_booking_db;Username=postgres;Password=postgres");
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Database=hall_booking_db;Username=postgres;Password=CHANGEME"
+  }
+}
 ```
-Change username, password, or database name if needed.
+Create `appsettings.json` from the example and update the connection string to match your local setup.
+The file is excluded from version control.
 
 ## Create and seed database
 
- 1. Start PostgreSQL
-
- 2. Create the database (run in Query Console):
+ 1. Create the database:
 ```SQL
 CREATE DATABASE hall_booking_db;
 ```
-3. Run migrations (inncludes seed data):
+2. Apply migrations (inncludes seed data):
 ```bash
 dotnet ef database update
 ```
 Seed data is defined in migrations and is created automatically.
 
- 4. Start the application
+ 3. Run the application
  
  ## Log in
  
